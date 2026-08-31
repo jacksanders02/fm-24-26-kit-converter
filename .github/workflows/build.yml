@@ -14,5 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
+        with:
+          cache: 'pip'
       - run: pip install -r requirements.txt
       - run: pylint
