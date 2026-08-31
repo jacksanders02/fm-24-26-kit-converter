@@ -19,3 +19,19 @@ jobs:
           cache: 'pip'
       - run: pip install -r requirements.txt
       - run: pylint src
+
+  build:
+    name: 🏗 Build
+    runs-on: windows-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          cache: 'pip'
+      - run: pip install -r requirements.txt pyinstaller
+      - run: pyinstaller convert.spec
+      - uses: actions/upload-artifact@v7
+        with:
+          path: dist/*
+

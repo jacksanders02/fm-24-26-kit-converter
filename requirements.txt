@@ -2,6 +2,7 @@ astroid==4.0.4
 colorama==0.4.6
 dill==0.4.1
 isort==9.0.1
+IMath==0.0.2
 mccabe==0.7.0
 mypy_extensions==1.1.0
 numpy==2.5.2
