@@ -113,7 +113,7 @@ jobs:
           curl -L \
             -H "Accept: application/vnd.github+json" \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            -L -o "${filename}.zip"
+            -L -o "${filename}.zip" \
             https://api.github.com/repos/jacksanders02/fm-24-26-kit-converter/actions/artifacts/${{ needs.build.outputs.artifact-id }}/zip
 
           unzip "${filename}.zip"
