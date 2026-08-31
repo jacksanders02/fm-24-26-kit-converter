@@ -7,23 +7,25 @@ https://sortitoutsi.net/content/74713/transferring-3d-outfits-from-fm24-to-fm26-
 
 from pathlib import Path
 from tkinter import filedialog, messagebox
-from os.path import abspath
-from sys import argv
+from os.path import abspath, dirname
+import sys
 from argparse import ArgumentParser
 import logging
 import numpy as np
 from PIL import Image
 import OpenEXR
+from Imath import PixelType # False Positive -- pylint: disable=no-name-in-module
 
 log = logging.getLogger(__name__)
 
-SCRIPT_PATH = Path(abspath(argv[0])).resolve().parent
-# ============================================================
-# EDIT THESE THREE PATHS
-# ============================================================
-LOOKUP_PATH = SCRIPT_PATH / "resources" / "fm24_to_fm26_lookup.exr"
-OUT_DIR    = SCRIPT_PATH / "output"
-# ============================================================
+# Path to script / executable (use for generating output dir)
+SCRIPT_PATH = Path(abspath(dirname(sys.argv[0]))).resolve()
+
+# Path to script / bundle directory (use for reading resources)
+BUNDLE_DIR = Path(getattr(sys, '_MEIPASS', abspath(dirname(__file__))))
+
+LOOKUP_PATH = BUNDLE_DIR / "resources" / "fm24_to_fm26_lookup.exr"
+OUT_DIR = SCRIPT_PATH / "output"
 
 def debug_uv(uv: np.ndarray):
     """
@@ -65,8 +67,10 @@ def load_lookup_exr(path: Path) -> np.ndarray:
     dw_width  = dw.max.x - dw.min.x + 1
     dw_height = dw.max.y - dw.min.y + 1
 
-    r = np.frombuffer(exr.channel("R", 2), dtype=np.float32).reshape((dw_height, dw_width))
-    g = np.frombuffer(exr.channel("G", 2), dtype=np.float32).reshape((dw_height, dw_width))
+    pixel_type = PixelType(PixelType.FLOAT)
+
+    r = np.frombuffer(exr.channel("R", pixel_type), dtype=np.float32).reshape((dw_height, dw_width))
+    g = np.frombuffer(exr.channel("G", pixel_type), dtype=np.float32).reshape((dw_height, dw_width))
 
     uv = np.stack([r, g], axis=-1)  # (H, W, 2)
 
@@ -101,7 +105,7 @@ def convert_image(src_path: Path, dest_path: Path, uv_map: np.ndarray):
 
     x = (u * (w_s - 1)).clip(0, w_s - 1)
     y = ((1.0 - v) * (h_s - 1)).clip(0, h_s - 1)
-    out = src[np.rint(x).astype(np.int32), np.rint(y).astype(np.int32)]
+    out = src[np.rint(y).astype(np.int32), np.rint(x).astype(np.int32)]
 
     # Save
     dest_path.parent.mkdir(parents=True, exist_ok=True)
@@ -130,17 +134,17 @@ def main():
     args = parser.parse_args()
     logging.basicConfig(level=args.loglevel)
 
+    if not LOOKUP_PATH.is_file():
+        raise FileNotFoundError(f"Lookup EXR not found: {LOOKUP_PATH}")
+
     messagebox.showinfo(
         "Select your FM24 Kits",
-        """Choose a folder containing FM24 3D Kits
-
-        (folder picker will appear after you click "OK")"""
+        "Choose a folder containing FM24 3D Kits\n\n"\
+        '(folder picker will appear after you click "OK")'
     )
 
     src_dir = Path(filedialog.askdirectory())
 
-    if not LOOKUP_PATH.is_file():
-        raise FileNotFoundError(f"Lookup EXR not found: {LOOKUP_PATH}")
     if not src_dir.is_dir():
         raise NotADirectoryError(f"FM24 directory not found: {src_dir}")
 
@@ -168,7 +172,7 @@ def main():
 
     messagebox.showinfo(
         "Success!",
-        'All kits are converted.\n\nThe FM26 3D kits should be in a folder called "Output".'
+        f'All kits are converted.\n\nThe FM26 3D kits have been saved to {OUT_DIR}.'
     )
 
 
