@@ -137,16 +137,19 @@ def main():
     if not LOOKUP_PATH.is_file():
         raise FileNotFoundError(f"Lookup EXR not found: {LOOKUP_PATH}")
 
-    messagebox.showinfo(
+    response = messagebox.askokcancel(
         "Select your FM24 Kits",
         "Choose a folder containing FM24 3D Kits\n\n"\
         '(folder picker will appear after you click "OK")'
     )
+    if not response:
+        sys.exit(0)
 
-    src_dir = Path(filedialog.askdirectory())
+    src_dir = filedialog.askdirectory()
+    if not src_dir:
+        sys.exit(0)
 
-    if not src_dir.is_dir():
-        raise NotADirectoryError(f"FM24 directory not found: {src_dir}")
+    src_dir = Path(src_dir)
 
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
