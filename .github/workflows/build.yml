@@ -1,0 +1,46 @@
+name: ♻ CI
+on: 
+  workflow_call:
+    outputs:
+      artifact-id:
+        description: "The ID of the built artifact"
+        value: ${{ jobs.build.outputs.artifact-id }}
+  pull_request:
+    branches: 
+      - main 
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: 🔎 Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          cache: pip
+          python-version-file: .python-version
+      - run: pip install -r requirements.txt
+      - run: pylint src
+
+  build:
+    name: 🏗 Build
+    runs-on: windows-latest
+    needs: lint
+    outputs:
+      artifact-id: ${{ steps.upload-artifact.outputs.artifact-id }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          cache: pip
+          python-version-file: .python-version
+      - run: pip install -r requirements.txt pyinstaller
+      - run: pyinstaller convert.spec
+      - id: upload-artifact
+        uses: actions/upload-artifact@v7
+        with:
+          path: dist/convert.exe
+

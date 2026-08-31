@@ -1,0 +1,13 @@
+astroid==4.0.4
+colorama==0.4.6
+dill==0.4.1
+isort==9.0.1
+IMath==0.0.2
+mccabe==0.7.0
+mypy_extensions==1.1.0
+numpy==2.5.2
+OpenEXR==3.4.15
+pillow==12.3.0
+platformdirs==4.11.5
+pylint==4.0.8
+tomlkit==0.15.1

@@ -1,0 +1,125 @@
+name: 🚀 Release
+on: 
+  workflow_dispatch:
+    inputs:
+      release-type:
+        description: "Choose Release Type"
+        required: true
+        type: choice
+        options:
+          - Patch
+          - Minor
+          - Major
+
+permissions:
+  contents: write
+
+jobs:
+  pre-release:
+    name: 🚨 Pre-Release Checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Branch Validation
+        shell: bash
+        run: |
+          echo "Validating release branch..."
+
+          if [[ "${GITHUB_REF_NAME}" !=  "main" && "${GITHUB_REF_NAME}" != release/* ]]; then
+            echo "Releases can only be created from a release branch! Current branch: ${GITHUB_REF_NAME}"
+            exit 1
+          fi
+
+  build:
+    # needs: pre-release
+    uses: ./.github/workflows/build.yml
+
+  calculate-tag:
+    name: 🧮 Calculate Next Tag
+    runs-on: ubuntu-latest
+    # needs: pre-release
+    outputs:
+      next_tag: ${{ steps.get-next-tag.outputs.next_tag }}
+    steps:
+      - uses: actions/checkout@v7
+        with: 
+          fetch-depth: 0
+          fetch-tags: true
+          persist-credentials: true
+
+      - name: Get previous tag
+        id: get-prev-tag
+        shell: bash
+        run: |
+          prev_tag=$(git describe --tags --abbrev=0 || echo "")
+          echo "Previous tag: ${prev_tag}"
+          echo "prev_tag=${prev_tag}" >> "${GITHUB_OUTPUT}"
+
+      - name: Calculate next tag
+        id: get-next-tag
+        shell: bash
+        run: |
+          prev_tag="${{ steps.get-prev-tag.outputs.prev_tag }}"
+
+          # If there is no previous tag, create v1.0.0
+          if [[ -z "${previous_tag}" ]]; then
+            echo "No previous tag! Creating v1.0.0"
+            echo "next_tag=1.0.0" >> "${GITHUB_OUTPUT}"
+            exit 0
+          fi
+
+          echo "Previous tag: ${prev_tag}"
+
+          # Get version number
+          version="${prev_tag#v}"
+          IFS='.' read -r major minor patch <<< "$version"
+
+          case "${{ inputs.release-type }}" in
+            Patch)
+              patch=$((patch + 1))
+              ;;
+            Minor)
+              patch=0
+              minor=$((minor + 1))
+              ;;
+            Major)
+              patch=0
+              minor=0
+              major=$((major + 1))
+          esac
+
+          next_tag="${major}.${minor}.${patch}"
+          echo "next_tag=${next_tag}" >> "${GITHUB_OUTPUT}"
+
+  release:
+    name: 🏷 Create Release Tag
+    runs-on: ubuntu-latest
+    needs: [build, calculate-tag]
+    steps:
+      - uses: actions/checkout@v7
+        with: 
+          fetch-depth: 0
+          fetch-tags: true
+          persist-credentials: true
+
+      - name: Download Artifact
+        id: download-artifact
+        uses: actions/download-artifact@v7
+        with:
+          artifact-ids: ${{ needs.build.outputs.artifact-id }}
+          path: downloaded-artifact.zip
+
+      - name: Rename Downloaded Artifact
+        id: extract-artifact
+        shell: bash
+        run: |
+          filename="fm24-26-kit-converter-${{ needs.calculate-tag.outputs.next_tag }}.exe"
+          mv "${{ steps.download-artifact.outputs.download-path }}/convert.exe" "$filename"
+          echo "artifact_filename=${filename}" >> "${GITHUB_OUTPUT}"
+        
+      - name: Create Release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: "v${{ needs.calculate-tag.outputs.next_tag }}"
+          target_commitish: ${{ github.sha }}
+          generate_release_notes: true
+          files: ${{ steps.extract-artifact.outputs.artifact_filename }}

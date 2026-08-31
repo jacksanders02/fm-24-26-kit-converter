@@ -2,4 +2,3 @@ output/
 .venv/
 build/
 dist/
-*.spec
