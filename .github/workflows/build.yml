@@ -1,6 +1,10 @@
 name: ♻ CI
 on: 
   workflow_call:
+    outputs:
+      artifact-url:
+        description: "The URL for the built artifact"
+        value: ${{ jobs.build.outputs.artifact-url }}
   pull_request:
     branches: 
       - main 
@@ -16,7 +20,8 @@ jobs:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
         with:
-          cache: 'pip'
+          cache: pip
+          python-version-file: .python-version
       - run: pip install -r requirements.txt
       - run: pylint src
 
@@ -24,14 +29,19 @@ jobs:
     name: 🏗 Build
     runs-on: windows-latest
     needs: lint
+    outputs:
+      artifact-url: ${{ steps.upload-artifact.outputs.artifact-url }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
         with:
-          cache: 'pip'
+          cache: pip
+          python-version-file: .python-version
       - run: pip install -r requirements.txt pyinstaller
       - run: pyinstaller convert.spec
-      - uses: actions/upload-artifact@v7
+      - id: upload-artifact
+        uses: actions/upload-artifact@v7
         with:
-          path: dist/*
+          path: dist/convert.exe
+          archive: false
 
