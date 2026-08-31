@@ -40,8 +40,4 @@ jobs:
       - run: pip install -r requirements.txt pyinstaller
       - run: pyinstaller convert.spec
       - id: upload-artifact
-        uses: actions/upload-artifact@v3
-        with:
-          path: dist/convert.exe
-          archive: false
-
+        uses: actions/upload-artifact@v7
