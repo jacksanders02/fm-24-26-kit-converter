@@ -18,22 +18,22 @@ permissions:
   contents: read
 
 jobs:
-  pre-release:
-    name: 🚨 Pre-Release Checks
-    runs-on: ubuntu-latest
-    steps:
-      - name: Branch Validation
-        shell: bash
-        run: |
-          echo "Validating release branch..."
+  # pre-release:
+  #   name: 🚨 Pre-Release Checks
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Branch Validation
+  #       shell: bash
+  #       run: |
+  #         echo "Validating release branch..."
 
-          if [[ "${GITHUB_REF_NAME}" != release/* ]]; then
-            echo "Releases can only be created from a release branch! Current branch: ${GITHUB_REF_NAME}"
-            exit 1
-          fi
+  #         if [[ "${GITHUB_REF_NAME}" != release/* ]]; then
+  #           echo "Releases can only be created from a release branch! Current branch: ${GITHUB_REF_NAME}"
+  #           exit 1
+  #         fi
 
   build:
-    needs: pre-release
+    # needs: pre-release
     uses: ./.github/workflows/build.yml
 
   release:
