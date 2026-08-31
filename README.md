@@ -25,7 +25,7 @@ For each FM24 kit image:
 
 ### Windows executable
 
-Download the latest `convert.exe` from the [Releases](../../releases) page
+Download the latest `convert.exe` from the [Releases](https://github.com/jacksanders02/fm-24-26-kit-converter/releases) page
 and run it. A window will prompt you to select a folder containing your FM24
 3D kits — the tool scans it recursively for `.png` files. Converted kits are
 written to an `output` folder created next to the executable, preserving the
