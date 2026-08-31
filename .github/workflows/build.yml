@@ -43,4 +43,5 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           path: dist/convert.exe
+          archive: false
 

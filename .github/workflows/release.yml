@@ -108,18 +108,8 @@ jobs:
         id: download-artifact
         uses: actions/download-artifact@v7
         with:
-          artifact-ids: ${{ needs.build.outputs.artifact-id }}
-
-      - name: Extract Downloaded Artifact
-        id: extract-artifact
-        shell: bash
-        run: |
-          filename="fm24-26-kit-converter-${{ needs.calculate-tag.outputs.next_tag }}.exe"
-
-          unzip ${{ steps.download-artifact.outputs.download-path }}
-          mv *.exe $filename
-
-          echo "artifact_filename=${filename}" >> "${GITHUB_OUTPUT}"
+          name: convert.exe
+          path: fm24-26-kit-converter-${{ needs.calculate-tag.outputs.next_tag }}.exe
         
       - name: Create Release
         uses: softprops/action-gh-release@v3
@@ -127,4 +117,4 @@ jobs:
           tag_name: "v${{ needs.calculate-tag.outputs.next_tag }}"
           target_commitish: ${{ github.sha }}
           generate_release_notes: true
-          files: ${{ steps.extract-artifact.outputs.artifact_filename }}
+          files: fm24-26-kit-converter-${{ needs.calculate-tag.outputs.next_tag }}.exe
