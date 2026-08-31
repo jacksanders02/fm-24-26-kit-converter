@@ -111,15 +111,12 @@ jobs:
           artifact-ids: ${{ needs.build.outputs.artifact-id }}
           path: downloaded-artifact.zip
 
-      - name: Extract Downloaded Artifact
+      - name: Rename Downloaded Artifact
         id: extract-artifact
         shell: bash
         run: |
           filename="fm24-26-kit-converter-${{ needs.calculate-tag.outputs.next_tag }}.exe"
-
-          unzip "${{ steps.download-artifact.outputs.download-path }}"
-          mv convert.exe $filename
-
+          mv "${{ steps.download-artifact.outputs.download-path }}/convert.exe" "$filename"
           echo "artifact_filename=${filename}" >> "${GITHUB_OUTPUT}"
         
       - name: Create Release
