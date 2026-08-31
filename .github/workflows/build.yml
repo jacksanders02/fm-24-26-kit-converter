@@ -2,9 +2,9 @@ name: ♻ CI
 on: 
   workflow_call:
     outputs:
-      artifact-url:
-        description: "The URL for the built artifact"
-        value: ${{ jobs.build.outputs.artifact-url }}
+      artifact-id:
+        description: "The ID of the built artifact"
+        value: ${{ jobs.build.outputs.artifact-id }}
   pull_request:
     branches: 
       - main 
@@ -30,7 +30,7 @@ jobs:
     runs-on: windows-latest
     needs: lint
     outputs:
-      artifact-url: ${{ steps.upload-artifact.outputs.artifact-url }}
+      artifact-id: ${{ steps.upload-artifact.outputs.artifact-id }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7

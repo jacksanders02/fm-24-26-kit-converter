@@ -90,6 +90,13 @@ jobs:
 
           next_tag="${major}.${minor}.${patch}"
           echo "next_tag=${next_tag}" >> "${GITHUB_OUTPUT}"
+
+      - name: Download Artifact
+        id: download-artifact
+        uses: actions/download-artifact@v7
+        with:
+          artifact-ids: ${{ needs.build.outputs.artifact-id }}
+
         
       - name: Create Release
         uses: softprops/action-gh-release@v3
@@ -97,4 +104,4 @@ jobs:
           tag_name: ${{ steps.get-next-tag.outputs.next_tag }}
           target_commitish: ${{ github.sha }}
           generate_release_notes: true
-          files: ${{ needs.build.outputs.artifact-url }}
+          files: ${{ steps.download-artifact.outputs.download-path }}
