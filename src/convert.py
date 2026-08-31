@@ -21,7 +21,7 @@ SCRIPT_PATH = Path(abspath(argv[0])).resolve().parent
 # ============================================================
 # EDIT THESE THREE PATHS
 # ============================================================
-LOOKUP_PATH = SCRIPT_PATH / "fm24_to_fm26_lookup.exr"
+LOOKUP_PATH = SCRIPT_PATH / "resources" / "fm24_to_fm26_lookup.exr"
 OUT_DIR    = SCRIPT_PATH / "output"
 # ============================================================
 
