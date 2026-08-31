@@ -108,23 +108,20 @@ jobs:
         id: download-artifact
         shell: bash
         run: |
-          filename="fm24-26-kit-converter-${{ steps.get-next-tag.outputs.next_tag }}"
+          filename="fm24-26-kit-converter-${{ needs.calculate-tag.outputs.next_tag }}.zip"
 
           curl -L \
             -H "Accept: application/vnd.github+json" \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            -L -o "${filename}.zip" \
+            -L -o "${filename}" \
             https://api.github.com/repos/jacksanders02/fm-24-26-kit-converter/actions/artifacts/${{ needs.build.outputs.artifact-id }}/zip
 
-          unzip "${filename}.zip"
-          mv convert.exe "${filename}.exe"
-
-          echo "artifact_filename=${filename}.exe" >> "${GITHUB_OUTPUT}"
+          echo "artifact_filename=${filename}" >> "${GITHUB_OUTPUT}"
         
       - name: Create Release
         uses: softprops/action-gh-release@v3
         with:
-          tag_name: "v${{ steps.get-next-tag.outputs.next_tag }}"
+          tag_name: "v${{ needs.calculate-tag.outputs.next_tag }}"
           target_commitish: ${{ github.sha }}
           generate_release_notes: true
           files: ${{ steps.download-artifact.outputs.artifact_filename }}
