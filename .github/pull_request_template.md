@@ -27,7 +27,3 @@
 - [ ] My changes are in sync with the code style of this project.
 - [ ] There aren't any other open Pull Requests for the same issue/update.
 - [ ] These changes should be applied to a maintenance branch.
-- [ ] I have added the Apache 2.0 license header to any new files created.
-
-## What is the Impact to Developers Using Fetchye?
-<!--- Please describe how your changes impacts developers using Fetchye. -->
