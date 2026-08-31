@@ -117,8 +117,8 @@ jobs:
         run: |
           filename="fm24-26-kit-converter-${{ needs.calculate-tag.outputs.next_tag }}.exe"
 
-          unzip downloaded-artifact.zip
-          mv *.exe $filename
+          unzip "${{ steps.download-artifact.outputs.download-path }}/downloaded-artifact.zip"
+          mv convert.exe $filename
 
           echo "artifact_filename=${filename}" >> "${GITHUB_OUTPUT}"
         
