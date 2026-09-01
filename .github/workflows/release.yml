@@ -30,13 +30,14 @@ jobs:
           fi
 
   build:
-    # needs: pre-release
+    name: 📦 Build for Release
+    needs: pre-release
     uses: ./.github/workflows/build.yml
 
   calculate-tag:
     name: 🧮 Calculate Next Tag
     runs-on: ubuntu-latest
-    # needs: pre-release
+    needs: pre-release
     outputs:
       next_tag: ${{ steps.get-next-tag.outputs.next_tag }}
     steps:
